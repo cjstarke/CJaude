@@ -6,11 +6,7 @@ The project has a React frontend (`frontend/`) and a Python backend (`backend/`)
 
 ## Demo
 
-Hover over a tool on the left and its tile rolls back and forth across the row:
-
-![The tool tiles rolling back and forth on hover](./frontend/public/CJaude.gif)
-
-Ask something in the chat, and each reply shows which tools CJaude used:
+Hover over a tool on the left and its tile rolls back and forth across the row. Ask something in the chat, and each reply shows which tools CJaude used:
 
 ![Chatting with CJaude and seeing which tools it used](./frontend/public/CJaude2.gif)
 
