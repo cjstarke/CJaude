@@ -1,24 +1,21 @@
 import { useState, useRef, useEffect } from "react";
 
 function Chat() {
-  // ---- State: the data this page depends on ----
-  const [messages, setMessages] = useState([]); // the chat bubbles on screen
-  const [history, setHistory] = useState([]); // what Claude sees, including tool calls
-  const [input, setInput] = useState(""); // what's typed in the box
-  const [loading, setLoading] = useState(false); // waiting for a reply?
-  const bottomRef = useRef(null); // an invisible marker at the end of the chat
+  const [messages, setMessages] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
 
-  // Scroll to the newest message whenever the messages change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
   async function sendMessage(event) {
-    event.preventDefault(); // stop the form from reloading the page
+    event.preventDefault();
     const text = input.trim();
     if (!text || loading) return;
 
-    // Add the user's message (a NEW list; never change state directly)
     const newMessages = [...messages, { role: "user", content: text }];
     setMessages(newMessages);
     setInput("");
@@ -28,14 +25,13 @@ function Chat() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Send the full history so Claude can see its earlier tool calls
         body: JSON.stringify({
           messages: [...history, { role: "user", content: text }],
         }),
       });
       if (!response.ok) throw new Error(`Server error ${response.status}`);
 
-      const data = await response.json(); // { reply, tools_used, messages }
+      const data = await response.json();
       setHistory(data.messages);
       setMessages([
         ...newMessages,
@@ -55,7 +51,6 @@ function Chat() {
     }
   }
 
-  // ---- What this component looks like ----
   return (
     <div className="flex flex-col lg:h-full lg:py-8 pl-4">
       {/* pr-1 and pb-1 leave room so the hard shadows aren't cut off */}

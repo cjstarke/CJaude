@@ -2,7 +2,7 @@ from agent import run_agent
 
 print("Chat with your agent! Type 'quit' to exit.\n")
 
-messages = []  # the conversation history; it grows as you chat
+messages = []
 
 while True:
     user_input = input("You: ").strip()

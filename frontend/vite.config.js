@@ -6,7 +6,6 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      // Any request starting with /api is forwarded to the Python server
       '/api': 'http://localhost:8000',
     },
   },

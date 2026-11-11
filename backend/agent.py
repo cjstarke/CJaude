@@ -7,7 +7,7 @@ load_dotenv()
 client = anthropic.Anthropic()
 
 MODEL = "claude-opus-5-5"
-MAX_STEPS = 10  # safety limit so it can never loop forever
+MAX_STEPS = 10
 
 SYSTEM_PROMPT = (
     "You are a friendly, helpful assistant. "
@@ -20,15 +20,9 @@ SYSTEM_PROMPT = (
 
 
 def run_agent(messages: list) -> tuple[str, list[str]]:
-    """
-    Run the agent loop on a conversation.
-    `messages` is updated in place with everything that happens.
-    Returns (final reply text, list of tool names that were used).
-    """
     tools_used = []
 
     for step in range(MAX_STEPS):
-        # 1. Send the whole conversation + tool descriptions to Claude
         response = client.messages.create(
             model=MODEL,
             max_tokens=16000,
@@ -37,31 +31,26 @@ def run_agent(messages: list) -> tuple[str, list[str]]:
             messages=messages,
         )
 
-        # 2. Save Claude's reply into the conversation history
-        #    (as plain dictionaries, so it can travel to the browser and back as JSON)
         messages.append({
             "role": "assistant",
             "content": [block.model_dump(mode="json", exclude_none=True) for block in response.content],
         })
 
-        # 3. If Claude didn't ask for a tool, we're done
         if response.stop_reason != "tool_use":
             break
 
-        # 4. Claude asked for tool(s): run each one and collect the results
         tool_results = []
         for block in response.content:
             if block.type == "tool_use":
-                print(f"   🔧 {block.name}({block.input})")  # so you can watch it work
+                print(f"   🔧 {block.name}({block.input})")
                 result = execute_tool(block.name, block.input)
                 tools_used.append(block.name)
                 tool_results.append({
                     "type": "tool_result",
-                    "tool_use_id": block.id,  # tells Claude which request this answers
+                    "tool_use_id": block.id,
                     "content": result,
                 })
 
-        # 5. Send ALL the results back together as one "user" message, then loop again
         messages.append({"role": "user", "content": tool_results})
     else:
         reply = "Sorry, I hit my step limit before finishing."
@@ -79,6 +68,5 @@ def run_agent(messages: list) -> tuple[str, list[str]]:
         messages[-1] = {"role": "assistant", "content": reply}
         return reply, tools_used
 
-    # Pull the text out of Claude's final reply
     text = "".join(block.text for block in response.content if block.type == "text")
     return text, tools_used

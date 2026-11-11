@@ -9,14 +9,12 @@ import LightningIcon from "./WeatherIcon";
 import WeatherIcon from "./WeatherIcon";
 gsap.registerPlugin(useGSAP);
 
-const ROLL_SPEED = 300; // pixels per second
+const ROLL_SPEED = 300;
 
-// Makes one .roll tile roll across its .roll-container on hover.
-// Returns a function that removes the hover listeners again.
 function setUpRolling(container, contextSafe) {
   const tile = container.querySelector(".roll");
   let hovering = false;
-  let rolling = false; // true from the first trip until the tile is home again
+  let rolling = false;
 
   // Measured often, since dragging the divider changes the width
   const getRoomToRoll = () => container.clientWidth - tile.offsetWidth;
@@ -46,7 +44,7 @@ function setUpRolling(container, contextSafe) {
 
   const startRolling = () => {
     hovering = true;
-    if (rolling || getRoomToRoll() <= 0) return; // a route already in progress keeps going
+    if (rolling || getRoomToRoll() <= 0) return;
     rolling = true;
     rollTo("right");
   };
@@ -67,7 +65,6 @@ function setUpRolling(container, contextSafe) {
 function Greeting() {
   const rootRef = useRef(null);
 
-  // Everything set up in here gets cleaned up when the component goes away
   useGSAP(
     (context, contextSafe) => {
       const containers = rootRef.current.querySelectorAll(".roll-container");

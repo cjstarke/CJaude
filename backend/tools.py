@@ -6,8 +6,6 @@ import urllib.parse
 import urllib.request
 from datetime import datetime
 
-# ---------- Part 1: Descriptions Claude reads ----------
-
 TOOLS = [
     {
         "name": "get_current_time",
@@ -90,13 +88,12 @@ TOOLS = [
     },
 ]
 
-# ---------- Part 2: The Python functions ----------
 
 def get_current_time() -> str:
     return datetime.now().strftime("%A, %B %d, %Y %I:%M %p")
 
 
-MAX_POWER_BITS = 10_000  # about 3,000 digits, plenty for normal math
+MAX_POWER_BITS = 10_000
 
 
 def _safe_pow(base, exponent):
@@ -179,7 +176,6 @@ def pick_random(options: list[str]) -> str:
     return random.choice(options)
 
 
-# Open-Meteo reports conditions as numeric weather codes
 _WEATHER_CODES = {
     0: "clear sky",
     1: "mainly clear",
@@ -219,7 +215,6 @@ def _fetch_json(url: str, params: dict) -> dict:
 
 
 def get_weather(city: str) -> str:
-    # Step 1: turn the city name into coordinates
     geocoded = _fetch_json(
         "https://geocoding-api.open-meteo.com/v1/search",
         {"name": city, "count": 1},
@@ -228,7 +223,6 @@ def get_weather(city: str) -> str:
         raise ValueError(f"I couldn't find a city called '{city}'")
     place = geocoded["results"][0]
 
-    # Step 2: look up the current weather at those coordinates
     forecast = _fetch_json(
         "https://api.open-meteo.com/v1/forecast",
         {
@@ -248,10 +242,7 @@ def get_weather(city: str) -> str:
     )
 
 
-# ---------- Dispatcher: the agent calls this ----------
-
 def execute_tool(name: str, tool_input: dict) -> str:
-    """Run the tool Claude asked for and return the result as text."""
     try:
         if name == "get_current_time":
             return get_current_time()
@@ -269,8 +260,6 @@ def execute_tool(name: str, tool_input: dict) -> str:
     except Exception as e:
         return f"Error: {e}"
 
-
-# ---------- Quick test: run this file directly ----------
 
 if __name__ == "__main__":
     print(execute_tool("get_current_time", {}))

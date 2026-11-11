@@ -2,22 +2,21 @@ import { useRef, useState } from "react";
 import Greeting from "./components/Greeting";
 import Chat from "./components/Chat";
 
-const MIN_PERCENT = 20; // neither side can be dragged smaller than this
+const MIN_PERCENT = 20;
 const MAX_PERCENT = 80;
-const KEYBOARD_STEP = 5; // how far one arrow key press moves the divider
+const KEYBOARD_STEP = 5;
 
 function clampPercent(percent) {
   return Math.min(MAX_PERCENT, Math.max(MIN_PERCENT, percent));
 }
 
 function App() {
-  const [leftPercent, setLeftPercent] = useState(50); // left section's share of the width
+  const [leftPercent, setLeftPercent] = useState(50);
   const leftRef = useRef(null);
   const rightRef = useRef(null);
-  const drag = useRef(null); // where the current drag started (null when not dragging)
+  const drag = useRef(null);
 
   function startDrag(event) {
-    // Keep receiving moves even if the pointer slides off the divider
     event.currentTarget.setPointerCapture(event.pointerId);
     const leftWidth = leftRef.current.getBoundingClientRect().width;
     const rightWidth = rightRef.current.getBoundingClientRect().width;
@@ -39,7 +38,6 @@ function App() {
     drag.current = null;
   }
 
-  // Lets keyboard users move the divider with the arrow keys
   function handleKeyDown(event) {
     if (event.key === "ArrowLeft") {
       setLeftPercent((percent) => clampPercent(percent - KEYBOARD_STEP));
